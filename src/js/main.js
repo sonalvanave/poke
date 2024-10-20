@@ -1,38 +1,45 @@
+import { shuffle } from "fast-shuffle";
 import data from "./data.json";
-// DOM Targeting
-const cardsRow=document.querySelector("#cards-row");
+import { PokemonCard } from "./components/PokemonCard";
+
+// DOM TARGETING
 const inputEl = document.querySelector("input");
+const cardsRowEl = document.querySelector("#cards-row");
 
-// const paragraph=document.createElement("p");
-// paragraph.textContent="our class";
-// cardsRow.appendChild(paragraph);
+function renderPokemon(list) {
+  cardsRowEl.innerHTML = "";
 
-for(let pokemanObj of data){
-const div = document.createElement("div");
-div.classList.add("col");
-div.innerHTML=`
-<div class="card">
-      <img src="${pokemanObj.image}"
-       class="card-img-top" alt="...">
-      <div class="card-body">
-        <h5 class="card-title">${pokemanObj.name}</h5>
-        <p class="card-text">
-          ${pokemanObj.description}
-      </div>
-    </div>`;
-    cardsRow.appendChild(div);
-
+  for (let pokeObj of list) {
+    const pokemon = PokemonCard(
+      pokeObj.image,
+      pokeObj.name,
+      pokeObj.description,
+      pokeObj.link
+    );
+    cardsRowEl.appendChild(pokemon);
+  }
 }
 
-//console.log(cardsRow);
-//for(let pokemanObj of data){
-  //  console.log(pokemanObj.name);
-//}
-//focus input on/ keypress
-document.addEventListener("keypress",function(event){
-  if(event.key=== "/"){
-    //dont'input
-    event.preventDefault();
+function renderFilteredPokemon(term) {
+  const filtered = [];
+  for (let obj of data) {
+    if (obj.name.toLowerCase().includes(term)) filtered.push(obj);
+  }
+
+  renderPokemon(filtered);
+}
+
+// Input element on change
+inputEl.addEventListener("input", (event) => {
+  const currValue = event.target.value.toLowerCase().trim();
+  renderFilteredPokemon(currValue);
+});
+
+// Focus input on slash keypress
+document.addEventListener("keyup", (event) => {
+  if (event.key === "/") {
     inputEl.focus();
   }
 });
+
+renderPokemon(shuffle(data));
