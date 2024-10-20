@@ -1,4 +1,6 @@
 import { shuffle } from "fast-shuffle";
+import Fuse from "fuse.js";
+
 import data from "./data.json";
 import { PokemonCard } from "./components/PokemonCard";
 
@@ -7,6 +9,7 @@ const inputEl = document.querySelector("input");
 const cardsRowEl = document.querySelector("#cards-row");
 
 function renderPokemon(list) {
+  console.log(list);
   cardsRowEl.innerHTML = "";
 
   for (let pokeObj of list) {
@@ -21,10 +24,11 @@ function renderPokemon(list) {
 }
 
 function renderFilteredPokemon(term) {
-  const filtered = [];
-  for (let obj of data) {
-    if (obj.name.toLowerCase().includes(term)) filtered.push(obj);
-  }
+  const fuse = new Fuse(data, {
+    keys: ["name"],
+  });
+
+  const filtered = fuse.search(term).map((obj) => obj.item);
 
   renderPokemon(filtered);
 }
